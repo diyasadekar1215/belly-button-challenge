@@ -12,7 +12,6 @@ function buildMetadata(sample) {
     // Use d3 to select the panel with id of `#sample-metadata`
     const PANEL = d3.select("#sample-metadata");
 
-
     // Use `.html("") to clear any existing metadata
     PANEL.html("");
 
@@ -24,7 +23,7 @@ function buildMetadata(sample) {
   });
 }
 
-// function to build both charts
+// Function to build both charts
 function buildCharts(sample) {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
 
@@ -40,15 +39,13 @@ function buildCharts(sample) {
     const otu_labels = result.otu_labels;
     const sample_values = result.sample_values;
 
-
     // Build a Bubble Chart
-
     const bubbleLayout = {
       title: "Bacteria Cultures Per Sample",
       margin: { t: 0 },
       hovermode: "closest",
       xaxis: { title: "OTU ID" },
-      margin: { t: 30}
+      margin: { t: 30 }
     };
     const bubbleData = [
       {
@@ -63,25 +60,31 @@ function buildCharts(sample) {
         }
       }
     ];
-   
+
     // Render the Bubble Chart
     Plotly.newPlot("bubble", bubbleData, bubbleLayout);
 
-    // Build a Bar Chart
+    // For the Bar Chart, map the otu_ids to a list of strings for your yticks
     const yticks = otu_ids.slice(0, 10).map(otuID => `OTU ${otuID}`).reverse();
+
+    // Build a Bar Chart
+    // Don't forget to slice and reverse the input data appropriately
     const barData = [
       {
-        y: yticks,
         x: sample_values.slice(0, 10).reverse(),
+        y: yticks,
         text: otu_labels.slice(0, 10).reverse(),
         type: "bar",
-        orientation: "h",
+        orientation: "h"
       }
     ];
+
     const barLayout = {
-      title: "Top 10 Bacteria Cultures Found",
-      margin: { t: 30, l: 150 }
+      title: "Top 10 Bacteria Cultures Found",  // Title for the chart
+      margin: { t: 30, l: 150 }                // Top and left margin settings
     };
+
+    // Render the Bar Chart
     Plotly.newPlot("bar", barData, barLayout);
   });
 }
@@ -89,9 +92,16 @@ function buildCharts(sample) {
 // Function to run on page load
 function init() {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
+
+    // Get the names field
     const sampleNames = data.names;
+
+    // Use d3 to select the dropdown with id of `#selDataset`
     const selector = d3.select("#selDataset");
 
+    // Use the list of sample names to populate the select options
+    // Hint: Inside a loop, you will need to use d3 to append a new
+    // option for each sample name.
     sampleNames.forEach((sample) => {
       selector
         .append("option")
@@ -99,8 +109,10 @@ function init() {
         .property("value", sample);
     });
 
-    // Build charts and metadata panel with the first sample
+    // Get the first sample from the list
     const firstSample = sampleNames[0];
+
+    // Build charts and metadata panel with the first sample
     buildCharts(firstSample);
     buildMetadata(firstSample);
   });
